@@ -25,7 +25,7 @@ const app = express();
 
 // Enable CORS
 app.use(cors({
-  origin: 'http://localhost:5173', // frontend origin
+  origin: 'https://bespoke-hotteok-477199.netlify.app/', // frontend origin
   credentials: true               // allow cookies, headers
 }));
 
