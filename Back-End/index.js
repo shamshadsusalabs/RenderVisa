@@ -24,9 +24,23 @@ const app = express();
 // 1) GLOBAL MIDDLEWARES
 
 // Enable CORS
+const allowedOrigins = [
+  'https://bespoke-hotteok-477199.netlify.app',
+  'http://localhost', // for local testing
+  'http://localhost:8081', // common React Native debug port
+  'capacitor://localhost', // Capacitor apps
+  'ionic://localhost' // Ionic apps
+];
+
 app.use(cors({
-  origin: 'https://bespoke-hotteok-477199.netlify.app', // frontend origin
-  credentials: true               // allow cookies, headers
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // Allow mobile apps with no origin
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
 }));
 
 
