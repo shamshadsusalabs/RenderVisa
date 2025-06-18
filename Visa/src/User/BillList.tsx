@@ -74,7 +74,7 @@ const BillList: React.FC = () => {
       try {
         setLoading(true);
         const phoneNumber = getPhoneNumber();
-        const response = await fetch(`https://rendervisa.onrender.com/api/payments/by-phone/${phoneNumber}`);
+        const response = await fetch(`http://localhost:5000/api/payments/by-phone/${phoneNumber}`);
         if (!response.ok) {
           throw new Error('Failed to fetch payments');
         }

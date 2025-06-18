@@ -91,7 +91,7 @@ export default function ApprovedVisaTable() {
           throw new Error('Phone number not found in user data');
         }
 
-        const response = await fetch(`https://rendervisa.onrender.com/api/VisaApplication/approved/${phoneNumber}`);
+        const response = await fetch(`http://localhost:5000/api/VisaApplication/approved/${phoneNumber}`);
         const result = await response.json();
         
         if (result.success) {

@@ -1,7 +1,19 @@
 import { FaSearch } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
-const Header = () => {
+interface HeaderProps {
+  onSearch: (query: string) => void;
+}
+
+const Header = ({ onSearch }: HeaderProps) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(searchQuery);
+  };
+
   return (
     <header className="bg-[#4A54F1] text-white pt-8 pb-12 md:pb-16 relative overflow-hidden h-96">
       {/* Decorative elements */}
@@ -45,22 +57,27 @@ const Header = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <div className="bg-white rounded-full flex items-center px-6 py-4 w-full max-w-2xl shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-[#F9D85E] focus-within:ring-opacity-50">
-          <FaSearch className="text-gray-500 mr-3 flex-shrink-0" size={18} />
-          <input
-            type="search"
-            placeholder="Where to?"
-            aria-label="Search destinations"
-            className="w-full outline-none text-gray-800 placeholder-gray-500 text-lg bg-transparent pr-4"
-          />
-          <motion.button 
-            className="bg-[#4A54F1] text-white px-6 py-2 rounded-full text-sm font-medium ml-2 whitespace-nowrap"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Find Visa
-          </motion.button>
-        </div>
+        <form onSubmit={handleSearch} className="w-full max-w-2xl">
+          <div className="bg-white rounded-full flex items-center px-6 py-4 w-full shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-[#F9D85E] focus-within:ring-opacity-50">
+            <FaSearch className="text-gray-500 mr-3 flex-shrink-0" size={18} />
+            <input
+              type="search"
+              placeholder="Where to? (e.g. Dubai, India)"
+              aria-label="Search destinations"
+              className="w-full outline-none text-gray-800 placeholder-gray-500 text-lg bg-transparent pr-4"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <motion.button 
+              type="submit"
+              className="bg-[#4A54F1] text-white px-6 py-2 rounded-full text-sm font-medium ml-2 whitespace-nowrap"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Find Visa
+            </motion.button>
+          </div>
+        </form>
       </motion.section>
     </header>
   );

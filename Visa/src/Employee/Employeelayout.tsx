@@ -1,7 +1,7 @@
-import { FiHome, FiFileText, FiPieChart, FiSettings, FiLogOut } from 'react-icons/fi';
+import { FiHome, FiFileText,  FiLogOut } from 'react-icons/fi';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
-const AdminLayout = () => {
+const EmployeeLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -10,7 +10,7 @@ const AdminLayout = () => {
     localStorage.clear();
 
     // ✅ Step 2: Call logout API
-    await fetch('http://localhost:5000/api/admin/logout', {
+    await fetch('http://localhost:5000/api/employee/logout', {
       method: 'POST',
       credentials: 'include', // include cookies if used
       headers: {
@@ -31,7 +31,7 @@ const AdminLayout = () => {
       <header className="bg-white shadow-sm z-10">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center">
-            <h1 className="text-xl font-semibold text-gray-800">Visa Admin Dashboard</h1>
+            <h1 className="text-xl font-semibold text-gray-800"> Employee Dashboard</h1>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -46,7 +46,7 @@ const AdminLayout = () => {
               <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
                 VA
               </div>
-              <span className="ml-2 text-sm font-medium text-gray-700">Admin</span>
+              <span className="ml-2 text-sm font-medium text-gray-700">Employee</span>
             </div>
           </div>
         </div>
@@ -64,43 +64,17 @@ const AdminLayout = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/dashboard/AllVisaApplication" className="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100">
+                <Link to="/employee-dashboard/AllVisaApplicationEmployee" className="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100">
                   <FiFileText className="h-5 w-5" />
                   <span className="ml-3">All Applications</span>
                 </Link>
               </li>
+             
+             
+             
               <li>
-                <Link to="/dashboard/visa-config-form" className="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100">
-                  <FiFileText className="h-5 w-5" />
-                  <span className="ml-3">Visa Config Form</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard/VisaConfigList" className="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100">
-                  <FiFileText className="h-5 w-5" />
-                  <span className="ml-3">All VisaConfigList</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard/reports" className="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100">
-                  <FiPieChart className="h-5 w-5" />
-                  <span className="ml-3">Reports</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard/settings" className="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100">
-                  <FiSettings className="h-5 w-5" />
-                  <span className="ml-3">Settings</span>
-                </Link>
-              </li>
-              <li>
-                 <li>
-                <Link to="/dashboard/Employee" className="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100">
-                  <FiSettings className="h-5 w-5" />
-                  <span className="ml-3">Employee</span>
-                </Link>
-              </li>
-              <li></li>
+               
+            
                 <button 
                   onClick={handleLogout} 
                   className="flex items-center w-full p-2 text-gray-700 rounded-lg hover:bg-gray-100"
@@ -122,4 +96,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default EmployeeLayout;

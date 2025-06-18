@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { Search, Eye, Edit, Users, CreditCard, Calendar, Phone, Mail, FileText } from "lucide-react"
+import { Search, Eye, Edit, Users, CreditCard, Calendar, Phone, Mail, FileText, UserPlus, X } from "lucide-react"
 
 interface Document {
   url: string
@@ -33,6 +33,7 @@ interface StatusEntry {
 interface VisaApplication {
   _id: string
   visaId: string
+  country: string
   paymentId: string
   travellers: string
   email: string
@@ -45,33 +46,56 @@ interface VisaApplication {
   statusHistory?: StatusEntry[]
 }
 
+interface Employee {
+  _id: string
+  name: string
+  phoneNumber: string
+  email: string
+  isVerified: boolean
+  visaIds: string[]
+  points: number
+  createdAt: string
+  updatedAt: string
+  __v: number
+}
+
 interface ApiResponse {
   message: string
   data: VisaApplication[]
+}
+
+interface EmployeeApiResponse {
+  message: string
+  data: Employee[]
 }
 
 const AllVisaApplication: React.FC = () => {
   const navigate = useNavigate()
   const [applications, setApplications] = useState<VisaApplication[]>([])
   const [filteredApplications, setFilteredApplications] = useState<VisaApplication[]>([])
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([])
   const [searchTerm, setSearchTerm] = useState("")
+  const [employeeSearchTerm, setEmployeeSearchTerm] = useState("")
   const [page, setPage] = useState(1)
   const [rowsPerPage] = useState(5)
   const [openStatusDialog, setOpenStatusDialog] = useState(false)
+  const [openAssignDialog, setOpenAssignDialog] = useState(false)
   const [newStatus, setNewStatus] = useState("")
   const [selectedApp, setSelectedApp] = useState<VisaApplication | null>(null)
   const [loading, setLoading] = useState(true)
+  const [employeesLoading, setEmployeesLoading] = useState(false)
   const [error, setError] = useState("")
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://rendervisa.onrender.com/api/VisaApplication/GetAll")
+        const response = await fetch("http://localhost:5000/api/VisaApplication/GetAll")
         const data: ApiResponse = await response.json()
         setApplications(data.data)
         setFilteredApplications(data.data)
         setLoading(false)
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError("Failed to fetch visa applications")
         setLoading(false)
@@ -80,6 +104,21 @@ const AllVisaApplication: React.FC = () => {
     fetchData()
   }, [])
 
+  const fetchEmployees = async () => {
+    setEmployeesLoading(true)
+    try {
+      const response = await fetch("http://localhost:5000/api/employee/getAll")
+      const data: EmployeeApiResponse = await response.json()
+      setEmployees(data.data || data)
+      setFilteredEmployees(data.data || data)
+      setEmployeesLoading(false)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      console.error("Failed to fetch employees")
+      setEmployeesLoading(false)
+    }
+  }
+
   useEffect(() => {
     const filtered = applications.filter(
       (app) =>
@@ -87,10 +126,20 @@ const AllVisaApplication: React.FC = () => {
         app.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         app.phone.includes(searchTerm) ||
         app.paymentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app._id.toLowerCase().includes(searchTerm.toLowerCase()),
+        app._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        app.country.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     setFilteredApplications(filtered)
   }, [searchTerm, applications])
+
+  useEffect(() => {
+    const filtered = employees.filter(
+      (employee) =>
+        employee.name.toLowerCase().includes(employeeSearchTerm.toLowerCase()) ||
+        employee.email.toLowerCase().includes(employeeSearchTerm.toLowerCase()),
+    )
+    setFilteredEmployees(filtered)
+  }, [employeeSearchTerm, employees])
 
   const getLastStatus = (app: VisaApplication) => {
     if (app.statusHistory && app.statusHistory.length > 0) {
@@ -135,15 +184,27 @@ const AllVisaApplication: React.FC = () => {
     setOpenStatusDialog(true)
   }
 
+  const openAssignModal = (app: VisaApplication) => {
+    setSelectedApp(app)
+    setOpenAssignDialog(true)
+    setEmployeeSearchTerm("")
+    if (employees.length === 0) {
+      fetchEmployees()
+    }
+  }
+
   const handleStatusChange = async () => {
     if (!selectedApp) return
 
     try {
-      const response = await fetch(`https://rendervisa.onrender.com/api/VisaApplication/visa-status/${selectedApp._id}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ label: newStatus }),
-      })
+      const response = await fetch(
+        `http://localhost:5000/api/VisaApplication/visa-status/${selectedApp._id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ label: newStatus }),
+        },
+      )
 
       if (response.ok) {
         setApplications((prev) =>
@@ -162,6 +223,34 @@ const AllVisaApplication: React.FC = () => {
       }
     } catch (err) {
       console.error("Error updating status:", err)
+    }
+  }
+
+  const handleAssignEmployee = async (employeeId: string) => {
+    if (!selectedApp) return
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/employee/addVisaId/${employeeId}/add-visa`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visaId: selectedApp.visaId }),
+      })
+
+      if (response.ok) {
+        // Update the employee's visaIds in local state
+        setEmployees((prev) =>
+          prev.map((emp) => (emp._id === employeeId ? { ...emp, visaIds: [...emp.visaIds, selectedApp.visaId] } : emp)),
+        )
+        setOpenAssignDialog(false)
+        // You might want to show a success message here
+        alert("Visa assigned successfully!")
+      } else {
+        console.error("Failed to assign visa")
+        alert("Failed to assign visa")
+      }
+    } catch (err) {
+      console.error("Error assigning visa:", err)
+      alert("Error assigning visa")
     }
   }
 
@@ -204,7 +293,7 @@ const AllVisaApplication: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search by Visa ID, Email, Phone, Payment ID, or Application ID..."
+            placeholder="Search by Visa ID, Email, Phone, Payment ID, Country, or Application ID..."
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -279,6 +368,9 @@ const AllVisaApplication: React.FC = () => {
                   Application
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Country
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -304,6 +396,9 @@ const AllVisaApplication: React.FC = () => {
                       <div className="text-sm font-medium text-gray-900">{app.visaId.substring(0, 8)}...</div>
                       <div className="text-sm text-gray-500">ID: {app._id.substring(0, 8)}...</div>
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{app.country}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
@@ -356,6 +451,13 @@ const AllVisaApplication: React.FC = () => {
                         <Edit className="w-4 h-4 mr-1" />
                         Status
                       </button>
+                      <button
+                        onClick={() => openAssignModal(app)}
+                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-lg text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+                      >
+                        <UserPlus className="w-4 h-4 mr-1" />
+                        Assign
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -398,7 +500,7 @@ const AllVisaApplication: React.FC = () => {
                 onClick={() => setOpenStatusDialog(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
               >
-                <span className="text-2xl">×</span>
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -430,6 +532,90 @@ const AllVisaApplication: React.FC = () => {
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 Update Status
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Employee Modal */}
+      {openAssignDialog && selectedApp && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl w-full max-w-lg">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900">Assign Employee</h2>
+              <button
+                onClick={() => setOpenAssignDialog(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-4">
+                <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg mb-4">
+                  Assigning visa: <strong className="text-gray-900">{selectedApp.visaId}</strong>
+                  <br />
+                  Country: <strong className="text-gray-900">{selectedApp.country}</strong>
+                </div>
+
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search employees by name or email..."
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={employeeSearchTerm}
+                    onChange={(e) => setEmployeeSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="max-h-64 overflow-y-auto">
+                {employeesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                  </div>
+                ) : filteredEmployees.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    {employeeSearchTerm ? "No employees found matching your search" : "No employees available"}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {filteredEmployees.map((employee) => (
+                      <div
+                        key={employee._id}
+                        onClick={() => handleAssignEmployee(employee._id)}
+                        className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium text-gray-900">{employee.name}</div>
+                            <div className="text-sm text-gray-500">{employee.email}</div>
+                            <div className="text-sm text-gray-500">{employee.phoneNumber}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm text-gray-500">
+                              {employee.visaIds.length} visa{employee.visaIds.length !== 1 ? "s" : ""} assigned
+                            </div>
+                            <div className="text-sm text-gray-500">{employee.points} points</div>
+                            {employee.isVerified && <div className="text-xs text-green-600 font-medium">Verified</div>}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={() => setOpenAssignDialog(false)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
+              >
+                Cancel
               </button>
             </div>
           </div>

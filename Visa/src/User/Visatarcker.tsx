@@ -24,7 +24,7 @@ const VisaStatusTracker = () => {
     const fetchStatus = async () => {
       try {
         const response = await fetch(
-          `https://rendervisa.onrender.com/api/VisaApplication/status/${paymentId}`
+          `http://localhost:5000/api/VisaApplication/status/${paymentId}`
         );
         const data = await response.json();
         

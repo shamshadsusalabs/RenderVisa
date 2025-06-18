@@ -1,12 +1,14 @@
 // AppRoutes.tsx
-// index.tsx
 import './utils/fetchWithAuth';
 
 import { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import ProtectedRoute from "./ProtectedRoute";
 import AdminProtectedRoute from "./AdminProtectedRoute";
-// Lazy loaded Visa components
+import EmployeeProtectedRoute from "./EmployeeProtectedRoute";
+
+// Lazy load Visa-related components
 const Navbar = lazy(() => import('./Visa/Navbar'));
 const DetailsNavbar = lazy(() => import('./Visa/DetailsNavbar'));
 const VisaService = lazy(() => import('./Visa/Header'));
@@ -21,14 +23,16 @@ const VisaProcess = lazy(() => import('./Visa/VisaProcess'));
 const VisaRejectionReasons = lazy(() => import('./Visa/VisaRejectionReasons'));
 const VisaWizard = lazy(() => import('./VisaConfiq/VisaWizard'));
 
-// Lazy loaded Admin/User components
+// Lazy load Admin components
 const AdminLayout = lazy(() => import('./Admin/AdminLayout'));
 const DashboardPage = lazy(() => import('./Admin/DashboardPage'));
 const Login = lazy(() => import('./Admin/Login'));
 const AllVisaApplication = lazy(() => import('./Admin/AllVisaApplication'));
 const VisaFullDetails = lazy(() => import('./Admin/VisaFullDeatils'));
-const VisaConfigList = lazy(() => import('./Admin/VisaConfigList')); // fixed typo
+const VisaConfigList = lazy(() => import('./Admin/VisaConfigList'));
+const Employee = lazy(() => import('./Admin/Employee'));
 
+// Lazy load User components
 const Auth = lazy(() => import('./User/auth'));
 const UserLayout = lazy(() => import('./User/UserLayout'));
 const GovissaWelcome = lazy(() => import('./User/GovissaWelcome'));
@@ -40,10 +44,16 @@ const Bill = lazy(() => import('./User/Bill'));
 const BillList = lazy(() => import('./User/BillList'));
 const UploadDocuments = lazy(() => import('./User/UplodDocumnets/upload-documents'));
 
+// Lazy load Employee components
+const Loginsignup = lazy(() => import('./Employee/Loginsignup'));
+const Employeelayout = lazy(() => import('./Employee/Employeelayout'));
+const AllVisaApplicationEmployee = lazy(() => import('./Employee/AllVisaApplicationEmployee'));
+
 function AppRoutes() {
   return (
-    <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen text-xl font-semibold">Loading Components...</div>}>
       <Routes>
+
         {/* Public Home Page */}
         <Route
           path="/"
@@ -59,7 +69,7 @@ function AppRoutes() {
           }
         />
 
-        {/* Public Visa Details Page */}
+        {/* Visa Details Page */}
         <Route
           path="/visa-details/:id"
           element={
@@ -96,7 +106,7 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         >
-           <Route index element={<GovissaWelcome />} />
+          <Route index element={<GovissaWelcome />} />
           <Route path="GovissaWelcome" element={<GovissaWelcome />} />
           <Route path="ApplyVisa" element={<ApplyVisa />} />
           <Route path="Approved" element={<Approved />} />
@@ -107,28 +117,45 @@ function AppRoutes() {
           <Route path="upload-documents/:visaId/:travellers/:paymentId/:country" element={<UploadDocuments />} />
         </Route>
 
-        {/* Public Admin Login */}
-        <Route path="/admin" element={<Login />} />
+        {/* Admin Routes */}
+        <Route path="/admin" element={<Navigate to="/admin/login" />} />
+        <Route path="/admin/login" element={<Login />} />
 
-        {/* Protected Admin Dashboard */}
         <Route
           path="/dashboard/*"
           element={
-          <AdminProtectedRoute>
+            <AdminProtectedRoute>
               <AdminLayout />
             </AdminProtectedRoute>
           }
-        ><Route index element={<DashboardPage />} />
-     
-        <Route path="VisaConfigList" element={<    VisaConfigList />} />
-          <Route path="visa-config-form" element={<VisaWizard />} />
+        >
+          <Route index element={<DashboardPage />} />
           <Route path="DashboardPage" element={<DashboardPage />} />
+          <Route path="VisaConfigList" element={<VisaConfigList />} />
+          <Route path="visa-config-form" element={<VisaWizard />} />
           <Route path="AllVisaApplication" element={<AllVisaApplication />} />
           <Route path="VisaFullDeatils/:id" element={<VisaFullDetails />} />
+          <Route path="Employee" element={<Employee />} />
         </Route>
 
-        {/* 404 Page */}
-        <Route path="*" element={<div className="text-center py-10">404 - Page Not Found</div>} />
+        {/* Employee Routes */}
+        <Route path="/employee" element={<Loginsignup />} />
+
+        <Route
+          path="/employee-dashboard/*"
+          element={
+            <EmployeeProtectedRoute>
+              <Employeelayout />
+            </EmployeeProtectedRoute>
+          }
+        >
+          <Route index element={<AllVisaApplicationEmployee />} />
+          <Route path="AllVisaApplicationEmployee" element={<AllVisaApplicationEmployee />} />
+        </Route>
+
+        {/* 404 Fallback */}
+        <Route path="*" element={<div className="text-center py-10 text-lg">404 - Page Not Found</div>} />
+        
       </Routes>
     </Suspense>
   );

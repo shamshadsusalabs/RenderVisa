@@ -35,7 +35,7 @@ const VisaRequirements = () => {
         }
 
         const response = await fetch(
-          `https://rendervisa.onrender.com/api/configurations/country-details/${countryId}`
+          `http://localhost:5000/api/configurations/country-details/${countryId}`
         );
 
         if (!response.ok) {
