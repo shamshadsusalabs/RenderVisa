@@ -242,7 +242,7 @@ const VisaConfigForm: React.FC = () => {
       }))
     }));
 
-    const response = await fetch('https://rendervisa.onrender.com/api/configurations/add', {
+    const response = await fetch('https://govisaa.el.r.appspot.com/api/configurations/add', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

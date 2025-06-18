@@ -43,8 +43,8 @@ const LoginSignup = () => {
 
     try {
       const url = isLogin 
-        ? 'http://localhost:5000/api/employee/login'
-        : 'http://localhost:5000/api/employee/signup';
+        ? 'https://govisaa.el.r.appspot.com/api/employee/login'
+        : 'https://govisaa.el.r.appspot.com/api/employee/signup';
 
       const body = isLogin
         ? { email, password }

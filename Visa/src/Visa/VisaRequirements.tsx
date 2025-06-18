@@ -35,7 +35,7 @@ const VisaRequirements = () => {
         }
 
         const response = await fetch(
-          `http://localhost:5000/api/configurations/country-details/${countryId}`
+          `https://govisaa.el.r.appspot.com/api/configurations/country-details/${countryId}`
         );
 
         if (!response.ok) {

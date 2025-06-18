@@ -11,7 +11,7 @@ const UserLayout: React.FC = () => {
       localStorage.removeItem('accessToken');
 
       // Step 2: Call logout API
-      await fetch('http://localhost:5000/api/User/logout', {
+      await fetch('https://govisaa.el.r.appspot.com/api/User/logout', {
         method: 'POST',
         credentials: 'include', // for cookie-based tokens, optional
         headers: {

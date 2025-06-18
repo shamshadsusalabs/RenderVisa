@@ -24,7 +24,7 @@ const VisaStatusTracker = () => {
     const fetchStatus = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/VisaApplication/status/${paymentId}`
+          `https://govisaa.el.r.appspot.com/api/VisaApplication/status/${paymentId}`
         );
         const data = await response.json();
         

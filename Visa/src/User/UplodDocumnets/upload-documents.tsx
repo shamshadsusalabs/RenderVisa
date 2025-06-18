@@ -40,7 +40,7 @@ export default function UploadDocuments() {
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/configurations/documents/${visaId}/documents-only`)
+        const response = await fetch(`https://govisaa.el.r.appspot.com/api/configurations/documents/${visaId}/documents-only`)
         const data = await response.json()
         if (data.success) {
           const docsWithSides = data.documents.map((doc: Document) => ({
@@ -326,7 +326,7 @@ export default function UploadDocuments() {
 
       console.log("🚀 Submitting visa application for", travellersCount, "travellers")
 
-      const response = await fetch("http://localhost:5000/api/VisaApplication/apply-visa", {
+      const response = await fetch("https://govisaa.el.r.appspot.com/api/VisaApplication/apply-visa", {
         method: "POST",
         body: formData,
       })

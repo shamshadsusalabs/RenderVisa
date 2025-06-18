@@ -10,7 +10,7 @@ const EmployeeLayout = () => {
     localStorage.clear();
 
     // ✅ Step 2: Call logout API
-    await fetch('http://localhost:5000/api/employee/logout', {
+    await fetch('https://govisaa.el.r.appspot.com/api/employee/logout', {
       method: 'POST',
       credentials: 'include', // include cookies if used
       headers: {

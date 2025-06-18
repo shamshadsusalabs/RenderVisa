@@ -38,7 +38,7 @@ const VisaBookingCard = () => {
 useEffect(() => {
   const fetchVisaData = async () => {
     try {
-      const response = await fetch("https://rendervisa.onrender.com/api/configurations/getAll");
+      const response = await fetch("https://govisaa.el.r.appspot.com/api/configurations/getAll");
       if (!response.ok) {
         throw new Error("Failed to fetch visa data");
       }

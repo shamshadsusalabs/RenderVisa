@@ -52,7 +52,7 @@ export default function PaymentHistory() {
 
     try {
       setStatusLoading((prev) => ({ ...prev, [paymentId]: true }))
-      const response = await fetch(`http://localhost:5000/api/VisaApplication/getbyPaymentID/${paymentId}`)
+      const response = await fetch(`https://govisaa.el.r.appspot.com/api/VisaApplication/getbyPaymentID/${paymentId}`)
 
       // Handle 404 as "no documents uploaded" instead of error
       if (response.status === 404) {
@@ -167,7 +167,7 @@ export default function PaymentHistory() {
           throw new Error("Phone number not found in user data")
         }
 
-        const response = await fetch(`http://localhost:5000/api/payments/by-phone/${phoneNumber}`)
+        const response = await fetch(`https://govisaa.el.r.appspot.com/api/payments/by-phone/${phoneNumber}`)
 
         if (!response.ok) {
           throw new Error("Failed to fetch payment history")

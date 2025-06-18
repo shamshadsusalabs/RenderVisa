@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt, FaCheck, FaClock, FaFilter } from 'react-icons/fa';
-import Header from './Header'; // Adjust the import path as needed
+import Header from './Header';
 
 interface Destination {
   _id: string;
@@ -11,7 +11,7 @@ interface Destination {
   totalFee: number;
 }
 
-const VisaDestinations: React.FC = () => {
+const VisaDestinations = () => {
   const navigate = useNavigate();
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,18 +19,14 @@ const VisaDestinations: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Extract processing time categories from the data
   const timeFilters = ['All', '3 days', '7 days', '14 days', '30 days'];
 
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/configurations/visa-summaries');
+        const response = await fetch('https://govisaa.el.r.appspot.com/api/configurations/visa-summaries');
         if (!response.ok) throw new Error('Failed to fetch destinations');
-
         const result = await response.json();
-        console.log('API Response:', result);
-
         setDestinations(result.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -44,18 +40,14 @@ const VisaDestinations: React.FC = () => {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query.toLowerCase());
-    setActiveFilter('All'); // Reset time filter when searching
+    setActiveFilter('All');
   };
 
   const filteredDestinations = destinations.filter(dest => {
-    // Apply search filter if there's a search query
     const matchesSearch = searchQuery === '' || 
       dest.name.toLowerCase().includes(searchQuery);
-    
-    // Apply time filter
     const matchesTimeFilter = activeFilter === 'All' || 
       dest.processingTime.includes(activeFilter);
-    
     return matchesSearch && matchesTimeFilter;
   });
 
@@ -104,15 +96,15 @@ const VisaDestinations: React.FC = () => {
     <div>
       <Header onSearch={handleSearch} />
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Header Section */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Visa Destinations</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            {searchQuery ? `Results for "${searchQuery}"` : 'Visa Destinations'}
+          </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Available visa processing destinations
+            {filteredDestinations.length} destinations found
           </p>
         </div>
 
-        {/* Filter Chips */}
         <div className="flex flex-wrap justify-center gap-3 mb-8">
           <div className="flex items-center text-gray-600 mr-2">
             <FaFilter className="mr-2" />
@@ -134,7 +126,6 @@ const VisaDestinations: React.FC = () => {
           ))}
         </div>
 
-        {/* Destination Cards */}
         {filteredDestinations.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredDestinations.map((dest) => (
@@ -143,7 +134,6 @@ const VisaDestinations: React.FC = () => {
                 onClick={() => handleClick(dest._id)}
                 className="cursor-pointer bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
-                {/* Image with badge */}
                 <div className="relative h-64 overflow-hidden">
                   <img
                     src={dest.image}
@@ -156,7 +146,6 @@ const VisaDestinations: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Card Content */}
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
@@ -171,16 +160,12 @@ const VisaDestinations: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Processing Time */}
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
                     <FaClock className="text-blue-500" />
                     <span>Processing: {dest.processingTime}</span>
                   </div>
 
-                  {/* View Details Button */}
-                  <button 
-                    className="w-full mt-auto bg-[#4A54F1] text-white py-3 rounded-lg text-sm font-medium transition-colors"
-                  >
+                  <button className="w-full mt-auto bg-[#4A54F1] text-white py-3 rounded-lg text-sm font-medium transition-colors">
                     View Details
                   </button>
                 </div>

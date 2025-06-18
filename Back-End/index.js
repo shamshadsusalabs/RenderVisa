@@ -17,6 +17,7 @@ const admin = require('./router/admin');
   const paymentRoutes = require('./router/payment');
   const User = require('./router/User');
     const promocode = require('./router/promocode');
+     const employee = require('./router/employee');
 
 connectDB();
 const app = express();
@@ -85,11 +86,12 @@ app.use('/api/admin', admin);
 
   app.use('/api/User',  User);
 
-promocode
+
 
 app.use('/api/payments', paymentRoutes);
 
 app.use('/api/promocode', promocode);
+app.use('/api/employee', employee);
 // Test route
 app.get('/api/health', (req, res) => {
   res.status(200).json({

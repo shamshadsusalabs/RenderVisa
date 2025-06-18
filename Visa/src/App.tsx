@@ -11,7 +11,7 @@ import EmployeeProtectedRoute from "./EmployeeProtectedRoute";
 // Lazy load Visa-related components
 const Navbar = lazy(() => import('./Visa/Navbar'));
 const DetailsNavbar = lazy(() => import('./Visa/DetailsNavbar'));
-const VisaService = lazy(() => import('./Visa/Header'));
+
 const VisaDestinations = lazy(() => import('./Visa/VisaDestinations'));
 const Banner = lazy(() => import('./Visa/Banner'));
 const VisaBookingCard = lazy(() => import('./Visa/VisaBookingCard'));
@@ -60,7 +60,7 @@ function AppRoutes() {
           element={
             <>
               <Navbar />
-              <VisaService />
+            
               <VisaDestinations />
               <VisasOnTime />
               <AtlysNews />

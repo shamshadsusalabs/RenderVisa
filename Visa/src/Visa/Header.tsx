@@ -1,6 +1,6 @@
+import { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 
 interface HeaderProps {
   onSearch: (query: string) => void;
@@ -62,7 +62,7 @@ const Header = ({ onSearch }: HeaderProps) => {
             <FaSearch className="text-gray-500 mr-3 flex-shrink-0" size={18} />
             <input
               type="search"
-              placeholder="Where to? (e.g. Dubai, India)"
+              placeholder="Search destinations (e.g. Dubai, India)"
               aria-label="Search destinations"
               className="w-full outline-none text-gray-800 placeholder-gray-500 text-lg bg-transparent pr-4"
               value={searchQuery}
